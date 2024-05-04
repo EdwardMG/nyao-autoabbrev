@@ -12,11 +12,11 @@ class NyaoAutoAbbrev
     return unless lc == ' ' || lc == '.' || lc == '(' || lc == '['
 
     c = l.split(/[ .(\[]/).last
-    if c && c.length == 2
+    if c && c.length < 5
       w = @words.find {|w| w.downcase.start_with? c }
       return unless w
 
-      l[-3..-2] = w
+      l[-(c.length+1)..-2] = w
       Ev.setline '.', l
       Ev.feedkeys ""
     end
