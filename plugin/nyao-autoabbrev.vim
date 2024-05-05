@@ -39,7 +39,7 @@ class NyaoAutoAbbrev
 
       # bug: [^A[ gets included in nearby words
       c = l.split(/[^A-z_]/)&.last
-      if c && c.length < 5
+      if c && c.length < 5 && !['of', 'it', 'an', 'and', 'to', 'for' 'my', 'end', 'me', 'ok', 'oh'].include?(c)
         nearby_words = Ev.getline(Ev.line('.')-3, Ev.line('.')+3)
         nearby_words = [
           nearby_words[3], # current line
@@ -54,7 +54,11 @@ class NyaoAutoAbbrev
         nearby_words.map! {|l| l.split(/[^A-z_]/) }
         nearby_words.flatten!
         nearby_words.compact!
-        nearby_words.select! {|w| w != '' && (w.length > 1 && w.match?(/[A-Z]/) || w.length > 3) && w != c }
+        nearby_words.select! do |w|
+          w != '' &&
+            (w.length > 1 && w.match?(/[A-Z]/) || w.length > 3) &&
+            w != c
+        end
         nearby_words.uniq!
 
         # TextDebug.clear
@@ -85,5 +89,4 @@ augroup END
 
 " this doesn't quite work the way you would want, if you aren't at the end of a line
 " we probably just want some easy way to turn it off completely when it gets annoying
-ino <silent> <bs> <c-o>:ruby $nyao_ignore_abbrev = true && Ev.setline('.', Ev.getline('.')[0..-2])<cr>
-
+ino <silent> <bs> <c-o>:ruby $nyao_ignore_abbrev = true<cr><bs>
