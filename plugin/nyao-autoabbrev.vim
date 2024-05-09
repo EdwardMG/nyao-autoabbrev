@@ -164,16 +164,30 @@ class NyaoAutoAbbrev
 
       c = cl.previous_word
       if c && c.length < 4 && !['of', 'it', 'in', 'an', 'and', 'get', 'to', 'for' 'my', 'the', 'end', 'me', 'ok', 'oh'].include?(c)
-        nearby_words = Ev.getline(Ev.line('.')-3, Ev.line('.')+3)
-        nearby_words = [
-          nearby_words[3], # current line
-          nearby_words[2], # line above
-          nearby_words[4], # line below
-          nearby_words[1], # etc
-          nearby_words[5],
-          nearby_words[0],
-          nearby_words[6],
-        ]
+        # lines = Ev.getline(Ev.line('.')-5, Ev.line('.')+5)
+
+        distance = 5
+        above = Ev.getline( Ev.line('.')-distance, Ev.line('.')-1)
+        below = Ev.getline( Ev.line('.')+1, Ev.line('.')+distance)
+        nearby_words = [ Ev.getline('.') ]
+        (0..(distance-1)).each do |i|
+          nearby_words << above[distance-i-1]
+          nearby_words << below[i]
+        end
+        # TextDebug << nearby_words.inspect
+        # nearby_words = [
+        #   Ev.getline( Ev.line('.') ), # current line
+        #   Ev.getline( Ev.line('.')-1 ), # line above
+        #   Ev.getline( Ev.line('.')+1 ), # line below
+        #   Ev.getline( Ev.line('.')-2 ), # etc
+        #   Ev.getline( Ev.line('.')+2 ),
+        #   Ev.getline( Ev.line('.')-3 ),
+        #   Ev.getline( Ev.line('.')+3 ),
+        #   Ev.getline( Ev.line('.')-4 ),
+        #   Ev.getline( Ev.line('.')+4 ),
+        #   Ev.getline( Ev.line('.')-5 ),
+        #   Ev.getline( Ev.line('.')+5 ),
+        # ]
         nearby_words.compact!
         nearby_words.map!.with_index do |l, i|
           l = i == 0 ? l.split(NOTWORD).reject {|x| x == c } : l.split(NOTWORD)
