@@ -143,7 +143,7 @@ class NyaoAutoAbbrev
   end
 
   def run
-    TextDebug.clear
+    # TextDebug.clear
     cl = CurrentLine.new
     return if cl.length < 2
     # ignore exactly one "run" statement recieved from TextChangedI
@@ -215,20 +215,6 @@ class NyaoAutoAbbrev
         cl.replace_previous_word w
         cl.reset_cursor
       end
-    end
-  end
-  def self.backspace
-    $nyao_ignore_abbrev = true
-    l = Ev.getline
-    # bug
-    cn = Ev.col('.')
-    if cn == l.length # our cursor is past the end of the line
-      l[-1] = ''
-      Ev.setline('.', l)
-    else # our cursor is in the middle of a line
-      l[Ev.col('.')-2] = ''
-      Ev.setline('.', l)
-      Ev.feedkeys "OD"
     end
   end
 end
