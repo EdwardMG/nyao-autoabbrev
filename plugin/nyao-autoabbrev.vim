@@ -10,14 +10,14 @@ class NyaoAutoAbbrev
     lines = Ev.getline(1, '$')
     @words = []
 
-    #Ev.getline(1, '$').each do |l|
-    #  m = l.match /^\s*(class|module|def)\s(self\.)*([A-z_0-9]+)/
-    #  @words << m[3] if m && m[3]
+    Ev.getline(1, '$').each do |l|
+      m = l.match /^\s*(class|module)\s(self\.)*([A-z_0-9]+)/
+      @words << m[3] if m && m[3]
 
-    #  # constants
-    #  m = l.match /^\s*([A-Z_0-9]+)\s/
-    #  @words << m[1] if m && m[1]
-    #end
+      # constants
+      m = l.match /^\s*([A-Z_0-9]+)\s/
+      @words << m[1] if m && m[1]
+    end
   end
 
   class CurrentLine
@@ -92,9 +92,12 @@ class NyaoAutoAbbrev
       i = col - 2 # apply index offset and move index LEFT of insert point
       return nil if line[i+1]&.match? WORD
 
+      dist = 0
       while i > 0 && line[i].match?(NOTWORD) do
         i -= 1
+        dist+=1
       end
+      return nil if dist > 1 # don't look back multiple NOTWORD characters
       i == -1 ? nil : i
     end
     def previous_word_ri_char = previous_word_ri ? line[ previous_word_ri ] : ''
@@ -166,7 +169,7 @@ class NyaoAutoAbbrev
       # for the offset
 
       c = cl.previous_word
-      if c && c.length < 4 && !["a", "t", 'of', 'it', 'in', 'an', 'and', 'get', 'to', 'for' 'my', 'the', 'end', 'me', 'ok', 'oh'].include?(c)
+      if c && c.length < 4 && !["a", "t", 'i', 'x', 'y', 'of', 'it', 'in', 'an', 'and', 'get', 'to', 'for' 'my', 'the', 'end', 'me', 'ok', 'oh'].include?(c)
         # lines = Ev.getline(Ev.line('.')-5, Ev.line('.')+5)
 
         distance = 5
@@ -203,13 +206,17 @@ class NyaoAutoAbbrev
 
         return if nearby_words.find {|w| w == c }
 
-        w = case c.length
-            when 1
-              nearby_words[0].flatten.find {|w| w.downcase.start_with? c }
-            when 2
-              nearby_words[0..2].flatten.find {|w| w.downcase.start_with? c }
-            when 3
-              nearby_words[0..-1].flatten.find {|w| w.downcase.start_with? c }
+        w = if c[0]&.match? /[A-Z]/
+              @words.find {|w| w.start_with? c }
+            else
+              case c.length
+              when 1
+                nearby_words[0].flatten.find {|w| w.downcase.start_with? c }
+              when 2
+                nearby_words[0..2].flatten.find {|w| w.downcase.start_with? c }
+              when 3
+                nearby_words[0..-1].flatten.find {|w| w.downcase.start_with? c }
+              end
             end
 
         return unless w
