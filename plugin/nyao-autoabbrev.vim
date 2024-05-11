@@ -198,8 +198,8 @@ class NyaoAutoAbbrev
           l.select! {|w| w != ''  }
           l
         end
-
-        # TextDebug << nearby_words.inspect
+        nearby_words[0..6].map &:reverse!
+        # TextDebug << nearby_words.inspect instant
 
         return if nearby_words.find {|w| w == c }
 
