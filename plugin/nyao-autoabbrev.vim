@@ -144,6 +144,7 @@ class NyaoAutoAbbrev
 
   def run
     # TextDebug.clear
+    Ev.prop_remove({type: 'NyaoAbbrevPreview', all: true})
     cl = CurrentLine.new
     return if cl.length < 2
     # ignore exactly one "run" statement recieved from TextChangedI
@@ -160,10 +161,12 @@ class NyaoAutoAbbrev
       $nyao_ignore_abbrev = true
     else
       lc = cl.previous_char
-      return unless ' .()[]'.include? lc
+
+      # TODO: this won't work anymore because previous word implicitly adjusts
+      # for the offset
 
       c = cl.previous_word
-      if c && c.length < 4 && !['of', 'it', 'in', 'an', 'and', 'get', 'to', 'for' 'my', 'the', 'end', 'me', 'ok', 'oh'].include?(c)
+      if c && c.length < 4 && !["a", "t", 'of', 'it', 'in', 'an', 'and', 'get', 'to', 'for' 'my', 'the', 'end', 'me', 'ok', 'oh'].include?(c)
         # lines = Ev.getline(Ev.line('.')-5, Ev.line('.')+5)
 
         distance = 5
@@ -211,9 +214,14 @@ class NyaoAutoAbbrev
 
         return unless w
 
-        # cl.display
-        cl.replace_previous_word w
-        cl.reset_cursor
+
+        if ' .()[]'.include? lc
+          # cl.display
+          cl.replace_previous_word w
+          cl.reset_cursor
+        else
+          Ev.prop_add(Ev.line('.'), Ev.col('.'), {type: "NyaoAbbrevPreview", text: w[(c.length)..-1]})
+        end
       end
     end
   end
@@ -223,10 +231,15 @@ NyaoAutoAbbrev.new
 RUBY
 endfu
 
+if empty(prop_type_get('NyaoAbbrevPreview'))
+  call prop_type_add('NyaoAbbrevPreview', { 'highlight': 'Comment', 'combine':   v:true })
+endif
+
 call s:setup()
 
 augroup NyaoAutoAbbrev
     autocmd!
+    autocmd InsertLeave * ruby Ev.prop_remove({type: 'NyaoAbbrevPreview', all: true})
     autocmd InsertEnter * ruby $nyao_abbrev = NyaoAutoAbbrev.new
     autocmd TextChangedI * ruby $nyao_abbrev.run
 augroup END
