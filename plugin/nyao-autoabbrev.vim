@@ -11,8 +11,8 @@ class NyaoAutoAbbrev
     @words = []
 
     Ev.getline(1, '$').each do |l|
-      m = l.match /^\s*(class|module)\s(self\.)*([A-z_0-9]+)/
-      @words << m[3] if m && m[3]
+      m = l.match /^\s*(class|module)\s([A-Za-z_0-9]+)/
+      @words << m[2] if m && m[2]
 
       # constants
       m = l.match /^\s*([A-Z_0-9]+)\s/
