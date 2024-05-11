@@ -165,9 +165,6 @@ class NyaoAutoAbbrev
     else
       lc = cl.previous_char
 
-      # TODO: this won't work anymore because previous word implicitly adjusts
-      # for the offset
-
       c = cl.previous_word
       if c && c.length < 4 && !["a", "t", 'i', 'x', 'y', 'of', 'it', 'in', 'an', 'and', 'get', 'to', 'for' 'my', 'the', 'end', 'me', 'ok', 'oh'].include?(c)
         # lines = Ev.getline(Ev.line('.')-5, Ev.line('.')+5)
