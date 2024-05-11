@@ -28,9 +28,7 @@ class NyaoAutoAbbrev
       @line = Ev.getline('.')
     end
 
-    def length
-      line.length
-    end
+    def length = line.length
 
     def display
       [
@@ -135,14 +133,7 @@ class NyaoAutoAbbrev
       line
     end
 
-    def reset_cursor
-      # different versions of vim might have different arguments for this
-      # function
-      Ev.setcursorcharpos(Ev.line('.'), col)
-    end
-
-     # <End>		cursor to after last char in the line	     *i_<End>*
-     # inoremap <expr> <C-E> col('.')>strlen(getline('.'))<bar><bar>pumvisible()?"\<Lt>C-E>":"\<Lt>End>"
+    def reset_cursor = Ev.setcursorcharpos(Ev.line('.'), col)
   end
 
   def run
@@ -217,7 +208,6 @@ class NyaoAutoAbbrev
             end
 
         return unless w
-
 
         if ' .()[]'.include? lc
           # cl.display
